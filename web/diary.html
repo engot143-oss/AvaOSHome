@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Private Diary - AVA OS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --text-secondary: #cbd5e1;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, #1a1f3a 100%);
+            color: var(--text);
+            padding: 16px;
+            min-height: 100vh;
+        }
+
+        .lock-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--bg) 0%, #1a1f3a 100%);
+            z-index: 9999;
+        }
+
+        .lock-screen.hidden {
+            display: none;
+        }
+
+        .lock-box {
+            background: var(--card);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .lock-box h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .lock-box p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .lock-box input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 8px;
+            color: var(--text);
+            margin-bottom: 16px;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .lock-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .lock-box button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary), #a78bfa);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .lock-box button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .lock-error {
+            color: #fca5a5;
+            font-size: 12px;
+            margin-top: -10px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .lock-error.show {
+            display: block;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+        }
+
+        h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, var(--primary), #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .back-btn {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .write-section {
+            background: var(--card);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .write-section h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
+        .date-input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 8px;
+            color: var(--text);
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .emoji-picker {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .emoji-btn {
+            font-size: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .emoji-btn:hover,
+        .emoji-btn.active {
+            background: rgba(99, 102, 241, 0.3);
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 12px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, var(--primary), #a78bfa);
+            color: white;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .save-btn:disabled {
+            background: #64748b;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .clear-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .clear-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .entries-section {
+            margin-top: 32px;
+        }
+
+        .entries-section h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: rgba(99, 102, 241, 0.3);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .entries-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .entry {
+            background: var(--card);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.3s;
+        }
+
+        .entry:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+
+        .entry-date {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .entry-mood {
+            font-size: 20px;
+        }
+
+        .entry-text {
+            color: var(--text);
+            line-height: 1.6;
+            margin-bottom: 8px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .entry-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .delete-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            color: #fecaca;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .privacy-note {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #86efac;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-top: 16px;
+            display: flex;
+            align-items: start;
+            gap: 8px;
+        }
+
+        .privacy-note::before {
+            content: "🔒";
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- PASSWORD LOCK SCREEN -->
+    <div class="lock-screen" id="lockScreen">
+        <div class="lock-box">
+            <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
+            <h2>My Private Diary</h2>
+            <p>Only you can access your diary. Enter your password to continue.</p>
+            <div class="lock-error" id="lockError">Incorrect password</div>
+            <input
+                type="password"
+                id="lockPassword"
+                placeholder="Enter diary password"
+                autocomplete="off"
+            >
+            <button onclick="checkDiaryPassword()">Unlock Diary</button>
+            <div style="margin-top: 16px; font-size: 12px; color: var(--text-secondary);">
+                <p>💡 Default password: <strong>diary123</strong></p>
+                <p style="margin-top: 8px;">You can change it after unlocking</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN DIARY CONTENT -->
+    <div class="container" id="diaryContent" style="display: none;">
+        <header>
+            <h1>📖 My Private Diary</h1>
+            <div style="display: flex; gap: 8px;">
+                <button class="back-btn" onclick="changePassword()" style="background: rgba(168, 85, 247, 0.1); border-color: #a78bfa; color: #d8b4fe;">🔑 Change Password</button>
+                <button class="back-btn" onclick="logoutDiary()">🔓 Logout</button>
+            </div>
+        </header>
+
+        <div class="privacy-note">
+            This diary stays completely private on your device. No one can read it, and it doesn't use any tokens or cost money. It's just for you.
+        </div>
+
+        <div class="write-section">
+            <h2>Write Today's Entry</h2>
+
+            <input
+                type="date"
+                id="entryDate"
+                class="date-input"
+                value=""
+            >
+
+            <div>
+                <label style="font-size: 13px; color: var(--text-secondary); display: block; margin-bottom: 8px;">
+                    How are you feeling today?
+                </label>
+                <div class="emoji-picker" id="emojiPicker">
+                    <button class="emoji-btn" data-emoji="😊">😊</button>
+                    <button class="emoji-btn" data-emoji="😢">😢</button>
+                    <button class="emoji-btn" data-emoji="😡">😡</button>
+                    <button class="emoji-btn" data-emoji="😴">😴</button>
+                    <button class="emoji-btn" data-emoji="😍">😍</button>
+                    <button class="emoji-btn" data-emoji="😌">😌</button>
+                    <button class="emoji-btn" data-emoji="🤔">🤔</button>
+                    <button class="emoji-btn" data-emoji="🙏">🙏</button>
+                </div>
+            </div>
+
+            <textarea
+                id="entryText"
+                placeholder="Write what's on your mind... Your thoughts, feelings, what you learned today, prayers, gratitude, anything!"
+            ></textarea>
+
+            <div class="button-group">
+                <button class="save-btn" onclick="saveEntry()">💾 Save Entry</button>
+                <button class="clear-btn" onclick="clearForm()">Clear</button>
+            </div>
+        </div>
+
+        <div class="entries-section">
+            <h2>Your Entries</h2>
+
+            <div class="filter-group">
+                <button class="filter-btn active" onclick="filterEntries('all')">All</button>
+                <button class="filter-btn" onclick="filterEntries('😊')">😊 Happy</button>
+                <button class="filter-btn" onclick="filterEntries('😢')">😢 Sad</button>
+                <button class="filter-btn" onclick="filterEntries('🙏')">🙏 Grateful</button>
+                <button class="filter-btn" onclick="filterEntries('🤔')">🤔 Thoughtful</button>
+            </div>
+
+            <div id="entriesList" class="entries-list"></div>
+
+            <div class="stats" id="stats"></div>
+        </div>
+    </div>
+
+    <script>
+        // PASSWORD PROTECTION
+        const DEFAULT_PASSWORD = 'mydaddy';
+        let isUnlocked = false;
+
+        function checkDiaryPassword() {
+            const password = document.getElementById('lockPassword').value;
+            const storedPassword = localStorage.getItem('diaryPassword') || DEFAULT_PASSWORD;
+
+            if (password === storedPassword) {
+                isUnlocked = true;
+                localStorage.setItem('diarySession', 'true');
+                document.getElementById('lockScreen').classList.add('hidden');
+                document.getElementById('diaryContent').style.display = 'block';
+                document.getElementById('lockPassword').value = '';
+                initializeDiary();
+            } else {
+                document.getElementById('lockError').classList.add('show');
+                document.getElementById('lockPassword').value = '';
+                setTimeout(() => {
+                    document.getElementById('lockError').classList.remove('show');
+                }, 2000);
+            }
+        }
+
+        function changePassword() {
+            const oldPassword = prompt('Enter your current password:');
+            if (oldPassword === null) return;
+
+            const storedPassword = localStorage.getItem('diaryPassword') || DEFAULT_PASSWORD;
+            if (oldPassword !== storedPassword) {
+                alert('❌ Wrong password');
+                return;
+            }
+
+            const newPassword = prompt('Enter your new password (at least 4 characters):');
+            if (newPassword === null) return;
+
+            if (newPassword.length < 4) {
+                alert('❌ Password must be at least 4 characters');
+                return;
+            }
+
+            localStorage.setItem('diaryPassword', newPassword);
+            alert('✅ Password changed successfully!');
+        }
+
+        function logoutDiary() {
+            localStorage.removeItem('diarySession');
+            isUnlocked = false;
+            document.getElementById('lockScreen').classList.remove('hidden');
+            document.getElementById('diaryContent').style.display = 'none';
+            document.getElementById('lockPassword').value = '';
+            document.getElementById('lockPassword').focus();
+        }
+
+        // Check if already unlocked
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('diarySession') === 'true') {
+                isUnlocked = true;
+                document.getElementById('lockScreen').classList.add('hidden');
+                document.getElementById('diaryContent').style.display = 'block';
+                initializeDiary();
+            } else {
+                document.getElementById('lockPassword').focus();
+            }
+        });
+
+        // Keyboard support for password
+        document.addEventListener('keydown', (e) => {
+            if (!isUnlocked && e.key === 'Enter') {
+                checkDiaryPassword();
+            }
+        });
+
+        function initializeDiary() {
+            // Initialize
+            document.getElementById('entryDate').valueAsDate = new Date();
+            currentFilter = 'all';
+            selectedMood = null;
+            loadEntries();
+        }
+
+        let currentFilter = 'all';
+        let selectedMood = null;
+
+        // Emoji picker
+        document.querySelectorAll('.emoji-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedMood = this.dataset.emoji;
+            });
+        });
+
+        function saveEntry() {
+            const date = document.getElementById('entryDate').value;
+            const text = document.getElementById('entryText').value.trim();
+            const mood = selectedMood || '📝';
+
+            if (!text) {
+                alert('Please write something!');
+                return;
+            }
+
+            // Get all entries
+            let entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+
+            // Add new entry
+            const entry = {
+                id: Date.now(),
+                date: date,
+                text: text,
+                mood: mood,
+                created: new Date().toISOString()
+            };
+
+            entries.push(entry);
+            localStorage.setItem('diaryEntries', JSON.stringify(entries));
+
+            // Clear form
+            clearForm();
+            loadEntries();
+
+            // Show success
+            alert('✅ Entry saved! It stays private on your device.');
+        }
+
+        function clearForm() {
+            document.getElementById('entryDate').valueAsDate = new Date();
+            document.getElementById('entryText').value = '';
+            document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('active'));
+            selectedMood = null;
+        }
+
+        function loadEntries() {
+            const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+            const filtered = currentFilter === 'all'
+                ? entries
+                : entries.filter(e => e.mood === currentFilter);
+
+            const list = document.getElementById('entriesList');
+
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <p>No entries yet. Start writing!</p>
+                    </div>
+                `;
+                updateStats([]);
+                return;
+            }
+
+            // Sort by date descending
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            list.innerHTML = filtered.map(entry => `
+                <div class="entry">
+                    <div class="entry-header">
+                        <span class="entry-date">${new Date(entry.date).toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        })}</span>
+                        <span class="entry-mood">${entry.mood}</span>
+                    </div>
+                    <div class="entry-text">${escapeHtml(entry.text)}</div>
+                    <div class="entry-actions">
+                        <button class="delete-btn" onclick="deleteEntry(${entry.id})">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+
+            updateStats(filtered);
+        }
+
+        function deleteEntry(id) {
+            if (!confirm('Delete this entry? You can\'t undo this.')) return;
+
+            let entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+            entries = entries.filter(e => e.id !== id);
+            localStorage.setItem('diaryEntries', JSON.stringify(entries));
+            loadEntries();
+        }
+
+        function filterEntries(mood) {
+            currentFilter = mood;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            loadEntries();
+        }
+
+        function updateStats(entries) {
+            const stats = document.getElementById('stats');
+
+            const totalEntries = JSON.parse(localStorage.getItem('diaryEntries') || '[]').length;
+            const moodCounts = {};
+
+            JSON.parse(localStorage.getItem('diaryEntries') || '[]').forEach(e => {
+                moodCounts[e.mood] = (moodCounts[e.mood] || 0) + 1;
+            });
+
+            const mostCommonMood = Object.entries(moodCounts)
+                .sort((a, b) => b[1] - a[1])[0];
+
+            stats.innerHTML = `
+                <div class="stat">
+                    <div class="stat-value">${totalEntries}</div>
+                    <div class="stat-label">Total Entries</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">${mostCommonMood ? mostCommonMood[0] : '📝'}</div>
+                    <div class="stat-label">Most Common Mood</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">🔒</div>
+                    <div class="stat-label">Private & Secure</div>
+                </div>
+            `;
+        }
+
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Load on startup
+        loadEntries();
+    </script>
+</body>
+</html>

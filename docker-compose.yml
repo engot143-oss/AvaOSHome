@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  ava-dashboard:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ava_memory:/root/.ava_os/memory
+      - ava_knowledge:/root/.ava_os/knowledge
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  kumon-learning:
+    build: .
+    command: python scripts/kumon_app.py
+    ports:
+      - "5001:5001"
+    volumes:
+      - kumon_data:/root/.ava_os/kumon
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  ava_memory:
+    driver: local
+  ava_knowledge:
+    driver: local
+  kumon_data:
+    driver: local

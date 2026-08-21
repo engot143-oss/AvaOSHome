@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="description" content="AVA OS - Kumon-structured learning with AI guidance">
+    <title>AVA OS - Daily Learning</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%236366f1' width='100' height='100'/><text x='50' y='65' font-size='60' fill='white' text-anchor='middle' font-weight='bold'>A</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #ffffff;
+            --bg-alt: #f9fafb;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1f2937;
+                --bg-alt: #111827;
+                --text: #f9fafb;
+                --text-light: #d1d5db;
+                --border: #374151;
+            }
+        }
+
+        html, body {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .streak-badge {
+            background: var(--primary-dark);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .daily-topic {
+            background: var(--bg-alt);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .daily-topic h2 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .topic-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .info-item {
+            background: var(--bg);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .progress-section {
+            background: var(--bg-alt);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .progress-section h3 {
+            margin-bottom: 16px;
+            font-size: 16px;
+        }
+
+        .progress-bar {
+            background: var(--border);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .progress-fill {
+            background: var(--primary);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .chat-section {
+            background: var(--bg-alt);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            margin-bottom: 24px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .message.assistant {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            align-self: flex-start;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-primary:disabled {
+            background: var(--text-light);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .dashboard-card {
+            background: var(--bg-alt);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .dashboard-card h4 {
+            color: var(--text-light);
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .dashboard-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .mastery-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .mastery-item:last-child {
+            border-bottom: none;
+        }
+
+        .mastery-name {
+            flex: 1;
+        }
+
+        .mastery-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            margin: 0 12px;
+            overflow: hidden;
+        }
+
+        .mastery-bar-fill {
+            height: 100%;
+            background: var(--success);
+        }
+
+        .mastery-percent {
+            width: 50px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 12px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .chat-section {
+                height: 400px;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .topic-info {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: var(--text);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% { opacity: 0.3; }
+            40% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AVA OS</h1>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <div class="streak-badge">🔥 <span id="streak">0</span> day streak</div>
+            <a href="diary.html" style="
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 14px;
+                font-weight: 600;
+                text-decoration: none;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                transition: all 0.3s;
+                display: inline-block;
+            " onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">📖 My Diary</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Daily Topic -->
+        <div class="daily-topic">
+            <h2>Today's Learning Topic</h2>
+            <div class="topic-info">
+                <div class="info-item">
+                    <div class="info-label">Subject</div>
+                    <div class="info-value" id="topicSubject">Math</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Concept</div>
+                    <div class="info-value" id="topicConcept">Loading...</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Difficulty</div>
+                    <div class="info-value" id="topicLevel">BEGINNER</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Time</div>
+                    <div class="info-value" id="topicTime">20 min</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Dashboard -->
+        <div class="progress-section">
+            <h3>Overall Progress</h3>
+            <div class="dashboard">
+                <div class="dashboard-card">
+                    <h4>Mastered</h4>
+                    <div class="value" id="masteredCount">0</div>
+                </div>
+                <div class="dashboard-card">
+                    <h4>In Progress</h4>
+                    <div class="value" id="inProgressCount">0</div>
+                </div>
+                <div class="dashboard-card">
+                    <h4>Total Mastery</h4>
+                    <div class="value" id="totalMastery">0%</div>
+                </div>
+                <div class="dashboard-card">
+                    <h4>Streak Days</h4>
+                    <div class="value" id="streakCount">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Interface -->
+        <div class="chat-section">
+            <h3>Chat with AVA</h3>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message assistant">
+                    Hello! I'm AVA. Let's practice today's topic together. Ask me anything about what you'd like to learn!
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input
+                    type="text"
+                    class="chat-input"
+                    id="chatInput"
+                    placeholder="Ask a question or type your answer..."
+                    autocomplete="off"
+                >
+                <button class="btn btn-primary" id="sendBtn">Send</button>
+            </div>
+        </div>
+
+        <!-- Subject Progress -->
+        <div class="progress-section">
+            <h3>Subject Mastery Levels</h3>
+            <div id="masteryList">
+                <p style="color: var(--text-light);">Loading progress...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        AVA OS - Kumon-structured learning with AI guidance | Developed for independent learning
+    </div>
+
+    <script>
+        // Initialize app
+        class AVAApp {
+            constructor() {
+                this.data = this.loadLocalData();
+                this.initializeUI();
+                this.setupEventListeners();
+            }
+
+            loadLocalData() {
+                const stored = localStorage.getItem('ava-data');
+                return stored ? JSON.parse(stored) : {
+                    streaks: 0,
+                    lastPractice: null,
+                    totalMastery: 0,
+                    masteryBySubject: {},
+                    chatHistory: []
+                };
+            }
+
+            saveLocalData() {
+                localStorage.setItem('ava-data', JSON.stringify(this.data));
+            }
+
+            initializeUI() {
+                this.updateStreakDisplay();
+                this.updateProgressDisplay();
+                this.loadTodaysTopic();
+            }
+
+            setupEventListeners() {
+                document.getElementById('sendBtn').addEventListener('click', () => this.sendMessage());
+                document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+            }
+
+            loadTodaysTopic() {
+                // Mock daily topic - in production, fetch from server
+                const topics = [
+                    { subject: 'math', concept: 'Addition (2-digit)', level: 'BEGINNER', time: 20 },
+                    { subject: 'science', concept: 'Living vs Non-living', level: 'BEGINNER', time: 20 },
+                    { subject: 'english', concept: 'Phonics & word families', level: 'BEGINNER', time: 20 },
+                    { subject: 'history', concept: 'Community helpers', level: 'BEGINNER', time: 20 },
+                    { subject: 'computer science', concept: 'Computer basics', level: 'BEGINNER', time: 20 }
+                ];
+
+                const dayIndex = new Date().getDate() % topics.length;
+                const today = topics[dayIndex];
+
+                document.getElementById('topicSubject').textContent = today.subject;
+                document.getElementById('topicConcept').textContent = today.concept;
+                document.getElementById('topicLevel').textContent = today.level;
+                document.getElementById('topicTime').textContent = today.time + ' min';
+            }
+
+            updateProgressDisplay() {
+                const mastered = Math.floor(Math.random() * 5);
+                const total = 26;
+                const inProgress = Math.floor(Math.random() * 8);
+
+                document.getElementById('masteredCount').textContent = mastered;
+                document.getElementById('inProgressCount').textContent = inProgress;
+                document.getElementById('totalMastery').textContent = Math.round((mastered / total) * 100) + '%';
+                document.getElementById('streakCount').textContent = this.data.streaks;
+
+                // Update mastery list
+                const subjects = ['Math', 'Science', 'English', 'History', 'Computer Science'];
+                let masteryHTML = '';
+
+                subjects.forEach(subject => {
+                    const masteryPercent = Math.floor(Math.random() * 100);
+                    masteryHTML += `
+                        <div class="mastery-item">
+                            <div class="mastery-name">${subject}</div>
+                            <div class="mastery-bar">
+                                <div class="mastery-bar-fill" style="width: ${masteryPercent}%"></div>
+                            </div>
+                            <div class="mastery-percent">${masteryPercent}%</div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('masteryList').innerHTML = masteryHTML;
+            }
+
+            updateStreakDisplay() {
+                document.getElementById('streak').textContent = this.data.streaks;
+            }
+
+            sendMessage() {
+                const input = document.getElementById('chatInput');
+                const message = input.value.trim();
+
+                if (!message) return;
+
+                // Add user message
+                this.addMessage(message, 'user');
+                input.value = '';
+
+                // Simulate AVA response
+                setTimeout(() => {
+                    const responses = [
+                        'Great question! Let me explain that...',
+                        'That\'s a smart approach! Here\'s how...',
+                        'Excellent thinking! Remember that...',
+                        'I like how you\'re thinking about this!'
+                    ];
+
+                    const response = responses[Math.floor(Math.random() * responses.length)];
+                    this.addMessage(response, 'assistant');
+
+                    // Record practice
+                    this.recordPractice();
+                }, 1000);
+            }
+
+            addMessage(text, role) {
+                const messagesDiv = document.getElementById('chatMessages');
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${role}`;
+                messageEl.textContent = text;
+                messagesDiv.appendChild(messageEl);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+                this.data.chatHistory.push({ text, role, timestamp: new Date().toISOString() });
+                this.saveLocalData();
+            }
+
+            recordPractice() {
+                const today = new Date().toDateString();
+                const lastPractice = this.data.lastPractice;
+
+                if (lastPractice !== today) {
+                    this.data.streaks += 1;
+                    this.data.lastPractice = today;
+                    this.saveLocalData();
+                    this.updateStreakDisplay();
+                }
+            }
+        }
+
+        // Start app
+        document.addEventListener('DOMContentLoaded', () => {
+            new AVAApp();
+        });
+
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(err => {
+                console.log('Service worker registration failed:', err);
+            });
+        }
+    </script>
+</body>
+</html>

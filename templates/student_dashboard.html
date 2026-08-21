@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👧 Student - Kumon Learning</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateX(4px);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            transform: translateX(4px);
+        }
+
+        .lesson-section {
+            grid-column: 1 / -1;
+        }
+
+        .exercise {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .exercise h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .question {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: monospace;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-submit {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background: #5568d3;
+        }
+
+        .result {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .result.correct {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .result.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .success-animation {
+            animation: bounce 0.5s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @media (max-width: 768px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .stats {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>👧 Student Dashboard</h1>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="streak">0</div>
+                    <div class="stat-label">🔥 Streak</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="accuracy">0%</div>
+                    <div class="stat-label">✅ Accuracy</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="level">1</div>
+                    <div class="stat-label">📚 Level</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="card">
+                <h2>Subject</h2>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="selectSubject('math')">
+                        <span>➕</span> Math
+                    </button>
+                    <button class="btn btn-secondary" onclick="selectSubject('english')">
+                        <span>📖</span> English
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Topics</h2>
+                <div class="btn-group" id="topics">
+                    <p style="color: #999; font-size: 14px;">Select a subject first</p>
+                </div>
+            </div>
+
+            <div class="card lesson-section hidden" id="lesson-card">
+                <h2 id="lesson-title">Lesson</h2>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div style="font-size: 12px; color: #666; margin-bottom: 15px;">
+                    <span id="progress-text">0 / 0</span>
+                </div>
+
+                <div id="exercises-container"></div>
+
+                <button class="btn btn-primary" id="finish-btn" style="display: none; width: 100%;">
+                    ✅ Finish Lesson
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSubject = null;
+        let currentLevel = 1;
+        let currentTopic = null;
+        let currentLesson = null;
+        let exerciseIndex = 0;
+        let correctCount = 0;
+        let levelsBySubject = { math: 1, english: 1 };
+
+        // Load initial progress
+        function loadProgress() {
+            fetch('/api/student/progress')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('streak').textContent = data.streak;
+                    levelsBySubject = data.levels;
+                    document.getElementById('level').textContent =
+                        currentSubject ? levelsBySubject[currentSubject] : '-';
+
+                    const accuracy = data.total_attempts > 0
+                        ? Math.round(data.total_correct / data.total_attempts * 100)
+                        : 0;
+                    document.getElementById('accuracy').textContent = accuracy + '%';
+                });
+        }
+
+        function selectSubject(subject) {
+            currentSubject = subject;
+            currentLevel = levelsBySubject[subject] || 1;
+            document.getElementById('level').textContent = currentLevel;
+            loadTopics();
+        }
+
+        function loadTopics() {
+            fetch(`/api/student/topics?subject=${currentSubject}&level=${currentLevel}`)
+                .then(r => r.json())
+                .then(data => {
+                    const container = document.getElementById('topics');
+                    if (data.topics.length === 0) {
+                        container.innerHTML = '<p style="color: #999;">No topics available</p>';
+                        return;
+                    }
+                    container.innerHTML = data.topics
+                        .map(topic => `
+                            <button class="btn btn-secondary" onclick="selectTopic('${topic}')">
+                                📝 ${topic}
+                            </button>
+                        `)
+                        .join('');
+                });
+        }
+
+        function selectTopic(topic) {
+            currentTopic = topic;
+            loadLesson();
+        }
+
+        function loadLesson() {
+            exerciseIndex = 0;
+            correctCount = 0;
+
+            fetch(`/api/student/lesson?subject=${currentSubject}&level=${currentLevel}&topic=${currentTopic}`)
+                .then(r => r.json())
+                .then(data => {
+                    currentLesson = data;
+                    document.getElementById('lesson-title').textContent = `📚 ${data.topic}`;
+                    document.getElementById('lesson-card').classList.remove('hidden');
+                    showExercise();
+                });
+        }
+
+        function showExercise() {
+            if (exerciseIndex >= currentLesson.exercises.length) {
+                showCompletion();
+                return;
+            }
+
+            const exercise = currentLesson.exercises[exerciseIndex];
+            const progress = exerciseIndex + 1;
+
+            document.getElementById('progress-text').textContent = `${progress} / ${currentLesson.total}`;
+            document.getElementById('progress-fill').style.width = (progress / currentLesson.total * 100) + '%';
+
+            const container = document.getElementById('exercises-container');
+            container.innerHTML = `
+                <div class="exercise">
+                    <h3>Question ${progress} of ${currentLesson.total}</h3>
+                    <div class="question">${exercise.q}</div>
+                    <div class="input-group">
+                        <input type="text" id="answer-input" placeholder="Your answer..." autofocus>
+                        <button class="btn-submit" onclick="submitAnswer()">Submit</button>
+                    </div>
+                    <div class="result" id="result"></div>
+                </div>
+            `;
+
+            document.getElementById('answer-input').addEventListener('keydown', e => {
+                if (e.key === 'Enter') submitAnswer();
+            });
+        }
+
+        function submitAnswer() {
+            const input = document.getElementById('answer-input');
+            const userAnswer = input.value.trim();
+            const exercise = currentLesson.exercises[exerciseIndex];
+            const resultDiv = document.getElementById('result');
+
+            if (!userAnswer) {
+                resultDiv.textContent = 'Please enter an answer';
+                resultDiv.className = 'result incorrect';
+                return;
+            }
+
+            const isCorrect = userAnswer.toLowerCase() === exercise.a.toLowerCase();
+
+            if (isCorrect) {
+                correctCount++;
+                resultDiv.textContent = '✅ Correct!';
+                resultDiv.className = 'result correct';
+                resultDiv.parentElement.classList.add('success-animation');
+                setTimeout(() => {
+                    exerciseIndex++;
+                    showExercise();
+                }, 1000);
+            } else {
+                resultDiv.textContent = `❌ Not quite. The answer is: ${exercise.a}`;
+                resultDiv.className = 'result incorrect';
+                setTimeout(() => {
+                    exerciseIndex++;
+                    showExercise();
+                }, 2000);
+            }
+        }
+
+        function showCompletion() {
+            const score = correctCount;
+            const total = currentLesson.total;
+            const percentage = Math.round(score / total * 100);
+
+            const container = document.getElementById('exercises-container');
+            container.innerHTML = `
+                <div class="exercise" style="text-align: center; border-left: none;">
+                    <h3 style="font-size: 24px; margin-bottom: 20px;">🎉 Lesson Complete!</h3>
+                    <div style="font-size: 48px; margin-bottom: 10px;">${percentage}%</div>
+                    <div style="font-size: 18px; margin-bottom: 10px;">${score} / ${total} correct</div>
+                    <div id="level-feedback" style="font-size: 14px; color: #667eea; font-weight: 600; margin-bottom: 20px; min-height: 20px;"></div>
+                    <button class="btn btn-primary" onclick="window.location.reload()" style="width: 100%;">
+                        📚 Next Lesson
+                    </button>
+                </div>
+            `;
+
+            // Save progress — the adaptive engine decides if this earns a level change
+            fetch('/api/student/submit-lesson', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    subject: currentSubject,
+                    level: currentLevel,
+                    topic: currentTopic,
+                    score: score,
+                    total: total
+                })
+            })
+            .then(r => r.json())
+            .then(result => {
+                const feedback = document.getElementById('level-feedback');
+                if (result.level_change === 'up') {
+                    feedback.textContent = `⬆️ Great work — leveled up to Level ${result.new_level}!`;
+                } else if (result.level_change === 'down') {
+                    feedback.textContent = `🔄 Let's build a stronger foundation at Level ${result.new_level} first.`;
+                } else {
+                    feedback.textContent = `Keep going at Level ${result.new_level} to build mastery.`;
+                }
+                loadProgress();
+            });
+        }
+
+        // Initialize
+        loadProgress();
+    </script>
+</body>
+</html>

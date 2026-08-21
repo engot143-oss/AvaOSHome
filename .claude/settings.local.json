@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(pip install flask flask-cors cryptography)",
+      "Bash(python -c \"import flask; print\\('flask ok', flask.__version__\\)\")",
+      "Bash(python -c ' *)",
+      "Bash(python scripts/kumon_app.py)",
+      "Bash(curl -s http://localhost:5001/)",
+      "Bash(curl -s http://localhost:5001/api/student/progress)",
+      "Bash(curl -s \"http://localhost:5001/api/student/lesson?subject=math&level=1&topic=Addition%20Basics\")",
+      "Bash(cat /tmp/kumon_log.txt)",
+      "Bash(curl -s -o /dev/null -w \"index: %{http_code}\\\\n\" http://localhost:5001/)",
+      "Bash(curl -s -o /dev/null -w \"student: %{http_code}\\\\n\" http://localhost:5001/student)",
+      "Bash(curl -s -o /dev/null -w \"parent: %{http_code}\\\\n\" http://localhost:5001/parent)",
+      "Bash(pkill -f \"kumon_app.py\")",
+      "Bash(curl -s http://localhost:5001/student)",
+      "Bash(powershell -Command \"Get-Process python -ErrorAction SilentlyContinue | Select-Object Id,ProcessName,StartTime\")",
+      "Bash(powershell -Command \"Get-NetTCPConnection -LocalPort 5001 -ErrorAction SilentlyContinue | Select-Object OwningProcess\")",
+      "Bash(powershell -Command \"Stop-Process -Id 10696,19104,21664,22752 -Force -ErrorAction SilentlyContinue\")",
+      "Bash(powershell -Command \"Get-NetTCPConnection -LocalPort 5001 -ErrorAction SilentlyContinue\")",
+      "Bash(nohup python scripts/kumon_app.py)",
+      "Bash(curl -s http://localhost:5001/api/parent/progress)",
+      "Bash(curl -s http://localhost:5001/api/parent/assignments)",
+      "Bash(powershell -Command \"Get-NetTCPConnection -LocalPort 5001 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess\")",
+      "Bash(powershell -Command \"Stop-Process -Id 14460 -Force -ErrorAction SilentlyContinue\")",
+      "Read(//c/Users/EricBegone/.ava_os/kumon/**)",
+      "Bash(curl -s -X POST http://localhost:5001/api/student/submit-lesson -H \"Content-Type: application/json\" -d '{\"subject\":\"math\",\"level\":1,\"topic\":\"Subtraction Basics\",\"score\":4,\"total\":4}')",
+      "Bash(curl -s -X POST http://localhost:5001/api/student/submit-lesson -H \"Content-Type: application/json\" -d '{\"subject\":\"math\",\"level\":1,\"topic\":\"Addition Basics\",\"score\":5,\"total\":5}')",
+      "Bash(curl -s http://localhost:5001/api/parent/adaptive)",
+      "Bash(curl -s \"http://localhost:5001/api/student/topics?subject=math\")",
+      "Bash(curl -s \"http://localhost:5001/api/student/lesson?subject=math\")",
+      "Bash(rm -f \"$HOME/.ava_os/kumon/progress.json\" \"$HOME/.ava_os/kumon/adaptive_difficulty.json\" \"$HOME/.ava_os/kumon/assignments.json\" *)",
+      "Bash(powershell -Command \"Stop-Process -Id 9424 -Force -ErrorAction SilentlyContinue\")",
+      "Bash(rm -f 'C:\\\\Users\\\\EricBegone/.ava_os/kumon/progress.json' 'C:\\\\Users\\\\EricBegone/.ava_os/kumon/adaptive_difficulty.json' 'C:\\\\Users\\\\EricBegone/.ava_os/kumon/assignments.json')",
+      "Bash(powershell -Command \"Stop-Process -Id 14304 -Force -ErrorAction SilentlyContinue\")",
+      "Bash(git add *)"
+    ]
+  }
+}
