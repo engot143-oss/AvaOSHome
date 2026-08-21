@@ -1,0 +1,15 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements-kumon.txt .
+RUN pip install --no-cache-dir -r requirements-kumon.txt
+
+COPY src/ src/
+COPY scripts/kumon_app.py scripts/kumon_app.py
+COPY templates/ templates/
+
+RUN mkdir -p /root/.ava_os/kumon
+
+# Railway/Render inject PORT at runtime; kumon_app.py reads it via os.environ
+CMD ["python", "scripts/kumon_app.py"]

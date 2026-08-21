@@ -204,11 +204,13 @@ if __name__ == "__main__":
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
         sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
 
+    port = int(os.environ.get("PORT", 5001))
+
     print("\n" + "="*60)
     print("KUMON LEARNING DASHBOARD")
     print("="*60)
-    print("\nStudent Dashboard:  http://localhost:5001/student")
-    print("Parent Dashboard:   http://localhost:5001/parent")
+    print(f"\nStudent Dashboard:  http://localhost:{port}/student")
+    print(f"Parent Dashboard:   http://localhost:{port}/parent")
     print("\n" + "="*60 + "\n")
 
-    app.run(host="0.0.0.0", port=5001, debug=False, use_reloader=False)
+    app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)

@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: kumon-dashboard
+    runtime: docker
+    dockerfilePath: ./Dockerfile.kumon
+    plan: free
+    healthCheckPath: /student
+    # NOTE: the free plan has no persistent disk, so her progress
+    # (streak, level, lesson history) resets on every redeploy/restart.
+    # Attach a paid disk mounted at /root/.ava_os/kumon to keep it.

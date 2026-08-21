@@ -33,7 +33,12 @@
       "Bash(powershell -Command \"Stop-Process -Id 9424 -Force -ErrorAction SilentlyContinue\")",
       "Bash(rm -f 'C:\\\\Users\\\\EricBegone/.ava_os/kumon/progress.json' 'C:\\\\Users\\\\EricBegone/.ava_os/kumon/adaptive_difficulty.json' 'C:\\\\Users\\\\EricBegone/.ava_os/kumon/assignments.json')",
       "Bash(powershell -Command \"Stop-Process -Id 14304 -Force -ErrorAction SilentlyContinue\")",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(docker --version)",
+      "PowerShell(docker --version)",
+      "Bash(PORT=5099 timeout 3 python scripts/kumon_app.py)",
+      "Bash(powershell -Command \"Get-NetTCPConnection -LocalPort 5099 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess\")"
     ]
   }
 }
