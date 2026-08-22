@@ -38,7 +38,11 @@
       "Bash(docker --version)",
       "PowerShell(docker --version)",
       "Bash(PORT=5099 timeout 3 python scripts/kumon_app.py)",
-      "Bash(powershell -Command \"Get-NetTCPConnection -LocalPort 5099 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess\")"
+      "Bash(powershell -Command \"Get-NetTCPConnection -LocalPort 5099 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess\")",
+      "Bash(gcloud --version)",
+      "PowerShell(gcloud --version 2>&1)",
+      "WebSearch",
+      "WebFetch(domain:docs.cloud.google.com)"
     ]
   }
 }
