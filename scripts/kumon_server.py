@@ -24,13 +24,49 @@ from collections import defaultdict
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
-from avaos.kumon import KumonTracker
-from avaos.memory import Memory
-from avaos.hallucination_prevention import HallucinationPreventionPipeline
-from avaos.faith_curriculum import FaithCurriculum
-from avaos.automation_framework import AutomationFramework
-from avaos.system_improvement_loop import SystemImprovementLoop
-from avaos.improvement_scheduler import initialize_scheduler, get_scheduler
+# Try to import optional modules - some may not be available
+try:
+    from avaos.kumon import KumonTracker
+except ImportError:
+    KumonTracker = None
+    print("[WARNING] KumonTracker not available")
+
+try:
+    from avaos.memory import Memory
+except ImportError:
+    Memory = None
+    print("[WARNING] Memory not available")
+
+try:
+    from avaos.hallucination_prevention import HallucinationPreventionPipeline
+except ImportError:
+    HallucinationPreventionPipeline = None
+    print("[WARNING] HallucinationPreventionPipeline not available")
+
+try:
+    from avaos.faith_curriculum import FaithCurriculum
+except ImportError:
+    FaithCurriculum = None
+    print("[WARNING] FaithCurriculum not available")
+
+try:
+    from avaos.automation_framework import AutomationFramework
+except ImportError:
+    AutomationFramework = None
+    print("[WARNING] AutomationFramework not available")
+
+try:
+    from avaos.system_improvement_loop import SystemImprovementLoop
+except ImportError:
+    SystemImprovementLoop = None
+    print("[WARNING] SystemImprovementLoop not available")
+
+try:
+    from avaos.improvement_scheduler import initialize_scheduler, get_scheduler
+except ImportError:
+    initialize_scheduler = None
+    get_scheduler = None
+    print("[WARNING] improvement_scheduler not available")
 
 app = Flask(__name__, static_folder=str(Path(__file__).parent.parent / 'web'))
 CORS(app)
@@ -43,16 +79,21 @@ RATE_LIMIT_PERIOD = 3600  # 1 hour
 # Rate limiting tracker
 rate_limiter = defaultdict(list)
 
-# Initialize components
+# Initialize components (gracefully handle missing modules)
 memory_dir = Path.home() / '.ava_os' / 'memory'
-curriculum_path = Path.home() / '.ava_os' / 'curriculum' / 'kumon_curriculum.json'
+memory_dir.mkdir(parents=True, exist_ok=True)
 
-memory = Memory(memory_dir)
-tracker = KumonTracker(memory_dir, curriculum_path)
-checker = HallucinationPreventionPipeline(memory_dir, curriculum_path)
-faith = FaithCurriculum(memory_dir)
-automation = AutomationFramework(memory_dir)
-improvement_loop = SystemImprovementLoop(memory_dir)
+curriculum_path = Path.home() / '.ava_os' / 'curriculum' / 'kumon_curriculum.json'
+curriculum_path.parent.mkdir(parents=True, exist_ok=True)
+
+memory = Memory(memory_dir) if Memory else None
+tracker = KumonTracker(memory_dir, curriculum_path) if KumonTracker else None
+checker = HallucinationPreventionPipeline(memory_dir, curriculum_path) if HallucinationPreventionPipeline else None
+faith = FaithCurriculum(memory_dir) if FaithCurriculum else None
+automation = AutomationFramework(memory_dir) if AutomationFramework else None
+improvement_loop = SystemImprovementLoop(memory_dir) if SystemImprovementLoop else None
+
+print("[AVA OS] Core initialized - ready to serve requests")
 
 
 # Security decorators
